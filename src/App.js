@@ -12,14 +12,15 @@ class App extends Component {
     this.state= {
       blackjack: [],
       // game: {
-        //   gameID: "",
-        //   cardsRemaining: 52,
-        //   shuffled: false,
-        // },
-        game: null,
-        playerName: "",
-    }
-  }
+      //   gameID: "",
+      //   cardsRemaining: 52,
+      //   shuffled: false,
+      // },
+      game: null,
+      playerName: "",
+      gameIDInput: "",
+    };
+  };
 
   componentDidMount() {
     // FIREBASE======================================
@@ -31,50 +32,7 @@ class App extends Component {
       console.log("database on change", database)
     })
     // ==============================================
-
-    // AXIOS=========================================
-    // axios({
-    //   url: `https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1`,
-    //   method: `GET`,
-    //   dataResponse: `json`
-    // }).then((result) => {
-    //   console.log("cards api result", result)
-    //   this.setState({
-    //     // game.gameID: result.data.deck_id
-    //     // game.cardsRemaining: result.data.remaining
-    //     // game.shuffled: result.data.shuffled
-    //     game: result.data
-
-    //   })
-    // })
-    // ==============================================
-
-    const MySwal = withReactContent(Swal)
-
-    // MySwal.fire({
-    //   // title: <p>Hello World</p>,
-    //   // footer: 'Copyright 2018',
-    //   icon: 'error',
-    //   title: 'Oops...',
-    //   text: 'Something went wrong!',
-    //   footer: '<a href>Why do I have this issue?</a>',
-    //   onOpen: () => {
-    //     // `MySwal` is a subclass of `Swal`
-    //     //   with all the same instance & static methods
-    //     MySwal.clickConfirm()
-    //   }
-    // }).then(() => {
-    //   return MySwal.fire()
-    // })
-
-    // Swal.fire({
-    //   icon: 'error',
-    //   title: 'Oops...',
-    //   text: 'Something went wrong!',
-    //   footer: '<a href>Why do I have this issue?</a>'
-    // })
-
-  }
+  };
 
 
 
@@ -87,19 +45,37 @@ class App extends Component {
       dataResponse: `json`
     });
     return await result
-  }
+  };
   // ====================================================
 
-
-
+  
+  
   // PLAYER NAME==========================================
     // read user input for name and save to state--------
-  handleChange = (event) => {
+  handleChangePlayerName = (event) => {
     this.setState({
       playerName: event.target.value
     });
-  }
+  };
   // ========================================================
+  
+
+
+  // NAME CHECK ERROR DIALOG=================================
+    // error dialog window displayed if user does not input a name
+  nameCheck = () => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Please enter a user name to begin',
+      showClass: {
+        popup: 'animated fadeInDown faster'
+      },
+      hideClass: {
+        popup: 'animated fadeOutUp faster'
+      }
+    });
+  };
+
 
 
   // NEW GAME================================================
@@ -119,25 +95,42 @@ class App extends Component {
         }
 
         firebase.database().ref(`/player1`).set(defaultProfile)
+
+        Swal.fire({
+          icon: 'success',
+          title: 'The Blackjack table will open momentarily',
+          html: `Please send your friend the game ID: <b>${this.state.game.deck_id}</b>`,
+          showClass: {
+            popup: 'animated fadeInDown faster'
+          },
+          hideClass: {
+            popup: 'animated fadeOutUp faster'
+          }
+        })
       })
       .catch(error => {console.log("axios error", error)})
     } else {
-      // alert("Please enter a user name to begin");
-      Swal.fire({
-        icon: 'error',
-        title: 'Please enter a user name to begin',
-        showClass: {
-          popup: 'animated fadeInDown faster'
-        },
-        hideClass: {
-          popup: 'animated fadeOutUp faster'
-        }
-      })
+      this.nameCheck();
     };
   };
   // ========================================================
 
+
+  // JOIN GAME===============================================
+    // user wants to join an existing game
+  handleClick = (event) => {
+    // check if user entered a name
+    if (this.state.playerName !== "") {
+      
+    } else {
+      this.nameCheck();
+    };
+  };
+  // ========================================================
+    
   
+  
+
 
   // RENDER==================================================
   render() {
@@ -153,9 +146,9 @@ class App extends Component {
         <fieldset>
           <legend>Enter your player name</legend>
           <form onSubmit={this.handleSubmit}>
-            <input type="text" id="playerName" value={this.state.playerNameInput} onChange={this.handleChange}/>
+            <input type="text" id="playerName" value={this.state.playerNameInput} onChange={this.handleChangePlayerName}/>
             <button type="submit" value="newGame">new game</button>
-            <button type="button" value="joinGame">join a game</button>
+            <button type="button" value="joinAGame" onClick={this.handleClick}>join a game</button>
           </form>
         </fieldset>
         {/* {
