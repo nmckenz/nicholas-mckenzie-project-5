@@ -7,23 +7,23 @@ import axios from "axios";
 import StartScreen from "./StartScreen.js";
 import JoinGame from "./JoinGame.js";
 import WaitingForPlayer from "./WaitingForPlayer.js";
+import GameTable from "./GameTable.js"
 import './App.css';
+import { readSync } from 'fs';
 
 
 
 class App extends Component {
   constructor() {
     super();
-    this.state= {
+    this.state = {
       blackjack: [],
-      // game: {
-      //   gameID: "",
-      //   cardsRemaining: 52,
-      //   shuffled: false,
-      // },
       game: null,
+      player1: false,
+      player2: false,
       playerName: "",
       gameIDInput: "",
+      playersReady: false,
       startScreen: true,
       joinGameScreen: false,
       waitingForPlayerScreen: false,
@@ -41,15 +41,13 @@ class App extends Component {
       console.log("database snapshot", snapshot)
       console.log("database on change", database)
 
-      // if ("player2" in database) {
-        
-      // }
-    })
+      this.playersReady(database);
+    });
     // ==============================================
   };
 
-
-
+  
+  
   // AXIOS==============================================
     // call api for new deck on game start--------------
   async getData(deck) {
@@ -73,7 +71,7 @@ class App extends Component {
   };
   // ======================================================
   
-
+  
 
   // GAME ID==============================================
     // read user input for game id and save to state
@@ -82,10 +80,10 @@ class App extends Component {
       gameIDInput: event.target.value
     });
   };
-  // =====================================================
-
-
-
+  // ========================================================
+  
+  
+  
   // NAME CHECK ERROR DIALOG=================================
     // error dialog window displayed if user does not input a name
   nameCheck = () => {
@@ -100,14 +98,14 @@ class App extends Component {
       }
     });
   };
-
-
-
+  // ========================================================
+  
+  
   // NEW GAME================================================
     // user wants to start new game---------------------------
   handleSubmitNewGame = (event) => {
     event.preventDefault();
-
+    
     // check if user entered a name, then make api call and instantiate player1 object in firebase
     if (this.state.playerName !== "") {
       this.getData("new").then(result => {
@@ -120,7 +118,7 @@ class App extends Component {
         }
 
         firebase.database().ref(`/player1`).set(defaultProfile)
-
+        
         Swal.fire({
           icon: 'success',
           title: 'The Blackjack table will open momentarily',
@@ -132,8 +130,9 @@ class App extends Component {
             popup: 'animated fadeOutUp faster'
           }
         })
-
+        
         this.setState({
+          player1: true,
           startScreen: false,
           waitingForPlayerScreen: true
         })
@@ -144,6 +143,7 @@ class App extends Component {
     };
   };
   // ========================================================
+  
 
 
   // JOIN GAME===============================================
@@ -162,21 +162,24 @@ class App extends Component {
   // ========================================================
     
   
+  
+  // JOIN A GAME=============================================
+    // user has entered an existing game ID and wants to join game
   handleSubmitJoinGame = (event) => {
     event.preventDefault();
-
+    
     if (this.state.gameIDInput !== "") {
       this.getData(this.state.gameIDInput).then(result => {
         this.setState({ game: result.data });
 
-      const defaultProfile = {
-        gameID: this.state.game.deck_id,
+        const defaultProfile = {
+          gameID: this.state.game.deck_id,
         userName: this.state.playerName,
         status: "pending",
       };
-
+      
       firebase.database().ref(`/player2`).set(defaultProfile);
-
+      
       Swal.fire({
         icon: 'success',
         title: 'The Blackjack table will open momentarily',
@@ -187,16 +190,30 @@ class App extends Component {
           popup: 'animated fadeOutUp faster'
         }
       });
-
+      
       this.setState({
+        player2: true,
         joinGameScreen: false,
         waitingForPlayerScreen: true
       })
-
+      
       })
-      .catch(error => { console.log("axios error", error) })
-    
-    
+      .catch((error) => {
+        console.log("axios error", error)
+
+        Swal.fire({
+          icon: 'error',
+          title: 'There is no existing game matching that ID.',
+          text: 'Please check the ID and try again',
+          footer: `${error}`,
+          showClass: {
+            popup: 'animated fadeInDown faster'
+          },
+          hideClass: {
+            popup: 'animated fadeOutUp faster'
+          }
+        });
+      })
     } else {
       Swal.fire({
         icon: 'error',
@@ -208,46 +225,48 @@ class App extends Component {
           popup: 'animated fadeOutUp faster'
         }
       });
-    }
+    };
+  };
+  // ========================================================
 
 
 
-    
-  }
+  // PLAYERS READY===========================================
+    // check if both players ready, if so render game table
+  playersReady = (database) => {
+    setTimeout(() => {
+      if ("player1" in database) {
+        if ("player2" in database) {
+          this.setState({
+            waitingForPlayerScreen: false,
+            playersReady: true
+          });
+          console.log("ready to BEGIN");
+        };
+      };
+    }, 2000);
+  };
+  // ========================================================
 
 
+  
   // RENDER==================================================
   render() {
-    console.log("this.state.game in render", this.state.game)
     return (
       <div className="App">
-        {/* <h1>Blackjack Buddies</h1>
-        
-        <fieldset>
-          <legend>Enter your player name</legend>
-          <form onSubmit={this.handleSubmit}>
-            <input type="text" id="playerName" value={this.state.playerNameInput} onChange={this.handleChangePlayerName}/>
-            <button type="submit" value="newGame">new game</button>
-            <button type="button" value="joinAGame" onClick={this.handleClick}>join a game</button>
-          </form>
-        </fieldset> */}
-        
-        {/* <StartScreen submit={this.handleSubmit} change={this.handleChangePlayerName} click={this.handleClick} /> */}
-
-
-
-        
           {this.state.startScreen && <StartScreen submit={this.handleSubmitNewGame} change={this.handleChangePlayerName} click={this.handleClick} />}
 
           {this.state.joinGameScreen && <JoinGame submit={this.handleSubmitJoinGame} change={this.handleChangeGameID}/>}
         
           {this.state.waitingForPlayerScreen && <WaitingForPlayer />}
+
+          {this.state.playersReady && <GameTable />}
       </div>
     );
-
   };
 };
 // =========================================================
+
 
 
 // EXPORT DEFAULT===========================================

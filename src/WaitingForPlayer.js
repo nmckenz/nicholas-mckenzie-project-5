@@ -1,8 +1,7 @@
 import React from "react";
 
 
-const WaitingForPlayer = (props) => {
-    // const { submit, change } = props;
+const WaitingForPlayer = () => {
 
     return (
         <div>
