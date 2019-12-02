@@ -21,9 +21,12 @@ class App extends Component {
       game: null,
       player1: false,
       player2: false,
+      player1Ready: false,
+      player2Ready: false,
+      playersReady: false,
       playerName: "",
       gameIDInput: "",
-      playersReady: false,
+      playersPresent: false,
       startScreen: true,
       joinGameScreen: false,
       waitingForPlayerScreen: false,
@@ -41,7 +44,8 @@ class App extends Component {
       console.log("database snapshot", snapshot)
       console.log("database on change", database)
 
-      this.playersReady(database);
+      this.playersPresent(database);
+      // this.playersReady(database);
     });
     // ==============================================
   };
@@ -50,9 +54,9 @@ class App extends Component {
   
   // AXIOS==============================================
     // call api for new deck on game start--------------
-  async getData(deck) {
+  async getData(deck, action) {
     const result = await axios({
-      url: `https://deckofcardsapi.com/api/deck/${deck}/shuffle/?deck_count=1`,
+      url: `https://deckofcardsapi.com/api/deck/${deck}/${action}`,
       method: `GET`,
       dataResponse: `json`
     });
@@ -108,13 +112,14 @@ class App extends Component {
     
     // check if user entered a name, then make api call and instantiate player1 object in firebase
     if (this.state.playerName !== "") {
-      this.getData("new").then(result => {
+      const action = "shuffle/?deck_count=1";
+      this.getData("new", action).then(result => {
         this.setState({game: result.data});
 
         const defaultProfile = {
           gameID: this.state.game.deck_id,
           userName: this.state.playerName,
-          status: "pending",
+          status: "initialize",
         }
 
         firebase.database().ref(`/player1`).set(defaultProfile)
@@ -169,13 +174,14 @@ class App extends Component {
     event.preventDefault();
     
     if (this.state.gameIDInput !== "") {
-      this.getData(this.state.gameIDInput).then(result => {
+      const action = "shuffle/?deck_count=1";
+      this.getData(this.state.gameIDInput, action).then(result => {
         this.setState({ game: result.data });
 
         const defaultProfile = {
           gameID: this.state.game.deck_id,
-        userName: this.state.playerName,
-        status: "pending",
+          userName: this.state.playerName,
+          status: "initialize",
       };
       
       firebase.database().ref(`/player2`).set(defaultProfile);
@@ -231,25 +237,106 @@ class App extends Component {
 
 
 
-  // PLAYERS READY===========================================
-    // check if both players ready, if so render game table
-  playersReady = (database) => {
+  // PLAYERS PRESENT===========================================
+    // check if both players present, if so render game table
+  playersPresent = (database) => {
     setTimeout(() => {
+
+      // NOTE Players Ready section fails on initial load because player1, player2 objects have not yet been created in firebase. To fix this issue, I start firebase with default player1 and player2 objects. In doing so, this broke Players Present section because the if-in statements are immediately true from initial load
+
       if ("player1" in database) {
         if ("player2" in database) {
           this.setState({
             waitingForPlayerScreen: false,
+            playersPresent: true,
             playersReady: true
           });
           console.log("ready to BEGIN");
+
+          //these are to deal with the issue NOTED above and below
+          const ready = { status: "pending" };
+          firebase.database().ref('/player1').update(ready)
+          firebase.database().ref('/player2').update(ready)
+
         };
       };
+
+
+      // NOTE to deal with the above, I refactored Players Present check to look for a change in firebase player object status key. Now, I am getting a "maximum update depth exceeded" error. React does not like the repeated setState calls from componentDidMount?
+      // SOLUTION? Perhaps I could further refactor the code to remove the ready button on game table load. Can I just assume that players are immediately ready to receive cards? If so, I could update firebase to player object status pending inside Players Present section.
+
+      // if (database.player1.status === "initialize" && database.player2.status === "initialize") {
+      //   this.setState({
+      //     waitingForPlayerScreen: false,
+      //     playersPresent: true
+      //   });
+      //   console.log("ready to BEGIN");
+      // };
     }, 2000);
   };
   // ========================================================
 
 
+
+  // PLAYERS READY===========================================
+    //check if both players ready, if so allow player 1 to deal
+  // handleClickReady = (event, player) => {
+  //   const ready = {status: "pending"};
+  //   const dbRef = firebase.database().ref(player);
+  //   dbRef.update(ready);
+  // }
+
+  // playersReady = (database) => {
+  //   setTimeout(() => {
+  //     if (database.player1.status === "pending" && database.player2.status === "pending") {
+  //       this.setState({
+  //         playersReady: true
+  //       })
+  //     }
+  //     // if (database.player1.status === "pending") {
+  //     //   this.setState({
+  //     //     player1Ready: true
+  //     //   })
+  //     // }
+  //   }, 2000);
+  // };
+  // ========================================================
+
+
+
+  // DEAL THE CARDS==========================================
+  handleClickDeal = (event) => {
+    // https://deckofcardsapi.com/api/deck/sbx4a2fp31m4/draw/?count=2
+
+    const dealPlayer1Cards = "draw/?count=2";
+    this.getData(this.state.game.deck_id, dealPlayer1Cards).then((result) => {
+      // https://deckofcardsapi.com/api/deck/sbx4a2fp31m4/pile/hand2/add/?cards=JS,6H
+
+      console.log("deal p1 result", result)
+      const card1 = result.data.cards[0].code;
+      const card2 = result.data.cards[1].code;
+      const takePlayer1Cards = `pile/player1/add/?cards=${card1},${card2}`;
+      this.getData(this.state.game.deck_id, takePlayer1Cards).then((result) => {
+        console.log("player 1 hand", card1, card2)
+      })
+    })
+
+    const dealPlayer2Cards = "draw/?count=2";
+    this.getData(this.state.game.deck_id, dealPlayer2Cards).then((result) => {
+
+      console.log("deal p2 result", result)
+      const card1 = result.data.cards[0].code;
+      const card2 = result.data.cards[1].code;
+      const takePlayer2Cards = `pile/player2/add/?cards=${card1},${card2}`;
+      this.getData(this.state.game.deck_id, takePlayer2Cards).then((result) => {
+        console.log("player 2 hand", card1, card2)
+      })
+    })
+  }
+  // ========================================================
   
+
+
   // RENDER==================================================
   render() {
     return (
@@ -260,7 +347,7 @@ class App extends Component {
         
           {this.state.waitingForPlayerScreen && <WaitingForPlayer />}
 
-          {this.state.playersReady && <GameTable />}
+          {this.state.playersPresent && <GameTable player1={this.state.player1} player2={this.state.player2} playersReady={this.state.playersReady} click={this.handleClickReady} clickDeal={this.handleClickDeal} />}
       </div>
     );
   };
