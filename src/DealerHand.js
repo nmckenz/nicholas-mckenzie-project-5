@@ -19,6 +19,9 @@ class DealerHand extends Component {
     render() {
         return (
             <div className="cards">
+                <div>
+                    <p>Dealer:</p>
+                </div>
                 <div className="card1">
                     <img src={this.props.cardImages[0]} alt="" />
                 </div>

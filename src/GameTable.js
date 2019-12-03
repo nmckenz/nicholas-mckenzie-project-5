@@ -60,12 +60,14 @@ class GameTable extends Component {
                 return (
                     <div>
                         <button onClick={this.props.endGame}>end game</button>
-                        <h1>images func is getting by...</h1>
+                        <h1>Getting your cards...</h1>
                     </div>
                 )
             } else {
                 return (
                     <div>
+                        <h1>Blackjack Buddies</h1>
+                        
                         {this.props.dealerCards ? (<DealerHand 
                         cardValues={this.props.dealerCardValues}
                         cardImages={this.props.dealerCardImages}
@@ -88,7 +90,7 @@ class GameTable extends Component {
                 return (
                     <div>
                         <button onClick={this.props.endGame}>end game</button>
-                        <h1>images func is also getting by here...</h1>
+                        <h1>Getting your cards...</h1>
                     </div>
                 )
             } else {
@@ -99,7 +101,8 @@ class GameTable extends Component {
                     </div>
                 )
             }
-        } else {
+        } 
+        else {
             return (
                 null
             )

@@ -113,6 +113,11 @@ button {
 .cards {
   text-align: left;
   height: 30vh;
+  margin-bottom: 25px;
+}
+
+.cards div {
+  display: inline-block;
 }
 
 .card1, .card2 {
