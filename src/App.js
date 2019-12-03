@@ -17,9 +17,6 @@ import './App.css';
 import { readSync } from 'fs';
 
 
-  // < i class="far fa-window-close" ></i >
-
-
 
 class App extends Component {
   constructor() {
@@ -61,14 +58,9 @@ class App extends Component {
 
     dbRef.on("value", (snapshot) => {
       const database = snapshot.val()
-      // console.log("database snapshot", snapshot)
-      // console.log("database on change", database)
-
-      // console.log("state players present", this.state.playersPresent)
       if (!this.state.playersPresent) {
         this.playersPresent(database);
       } 
-      // this.playersReady(database);
       this.renderTrigger()
     });
     // ==============================================
@@ -76,6 +68,7 @@ class App extends Component {
   };
   // library.add(faWindowClose)
   
+
   renderTrigger = () => {
     this.setState({
       blackjack: true
@@ -283,8 +276,6 @@ class App extends Component {
   playersPresent = (database) => {
     setTimeout(() => {
 
-      // NOTE Players Ready section fails on initial load because player1, player2 objects have not yet been created in firebase. To fix this issue, I start firebase with default player1 and player2 objects. In doing so, this broke Players Present section because the if-in statements are immediately true from initial load
-
       if ("player1" in database) {
         if ("player2" in database) {
           this.setState({
@@ -292,63 +283,20 @@ class App extends Component {
             playersPresent: true,
             playersReady: true
           });
-          console.log("ready to BEGIN");
-
-          //these are to deal with the issue NOTED above and below
           const ready = { status: "pending" };
           firebase.database().ref('/player1').update(ready)
           firebase.database().ref('/player2').update(ready)
 
         };
       };
-
-
-      // NOTE to deal with the above, I refactored Players Present check to look for a change in firebase player object status key. Now, I am getting a "maximum update depth exceeded" error. React does not like the repeated setState calls from componentDidMount?
-      // SOLUTION? Perhaps I could further refactor the code to remove the ready button on game table load. Can I just assume that players are immediately ready to receive cards? If so, I could update firebase to player object status pending inside Players Present section.
-
-      // if (database.player1.status === "initialize" && database.player2.status === "initialize") {
-      //   this.setState({
-      //     waitingForPlayerScreen: false,
-      //     playersPresent: true
-      //   });
-      //   console.log("ready to BEGIN");
-      // };
     }, 2000);
   };
   // ========================================================
 
 
 
-  // PLAYERS READY===========================================
-    //check if both players ready, if so allow player 1 to deal
-  // handleClickReady = (event, player) => {
-  //   const ready = {status: "pending"};
-  //   const dbRef = firebase.database().ref(player);
-  //   dbRef.update(ready);
-  // }
-
-  // playersReady = (database) => {
-  //   setTimeout(() => {
-  //     if (database.player1.status === "pending" && database.player2.status === "pending") {
-  //       this.setState({
-  //         playersReady: true
-  //       })
-  //     }
-  //     // if (database.player1.status === "pending") {
-  //     //   this.setState({
-  //     //     player1Ready: true
-  //     //   })
-  //     // }
-  //   }, 2000);
-  // };
-  // ========================================================
-
-
-
   // DEAL THE CARDS==========================================
   handleClickDeal = (event) => {
-    // https://deckofcardsapi.com/api/deck/sbx4a2fp31m4/draw/?count=2
-
     const dealPlayer1Cards = "draw/?count=2";
     this.getData(this.state.game.deck_id, dealPlayer1Cards).then((result) => {
       console.log("deal p1 result", result)
@@ -391,13 +339,6 @@ class App extends Component {
         player2Cards: true,
         player2CardValues: [card1, card2]
       })
-
-      // if (this.state.player1cards && this.state.player2cards) {
-      //   console.log("players have cards")
-      //   this.setState({
-      //     playersHaveCards: true
-      //   })
-      // }
     })
 
     const dealDealerCards = "draw/?count=2";
@@ -428,7 +369,6 @@ class App extends Component {
 
   // GET CARD IMAGES=========================================
   getCardImages = (player) => {
-    // console.log("concat test", `/${player}/hand`)
     const cardImagesObject = firebase.database().ref(`/${player}/hand`).on("value", data => {
       console.log("firebase card image data", data.val())
       if (player === "player1") {
@@ -452,6 +392,7 @@ class App extends Component {
   // ========================================================
 
 
+
   // HAND VALUATION==========================================
   evalHand = (handArray) => {
     const oldArray = [...handArray];
@@ -473,17 +414,21 @@ class App extends Component {
         }
       }
     })
-    console.log("value array", valueArray)
 
     if (Array.isArray(valueArray[0]) || Array.isArray(valueArray[1])) {
-      console.log("Array.isArray -1", valueArray[0], valueArray[1])
-      if (Array.isArray(valueArray[0])) {
+      if (Array.isArray(valueArray[0]) && Array.isArray(valueArray[1])) {
+        valueArray[0] = 1
+      } else if (Array.isArray(valueArray[0])) {
         if ((11 + valueArray[1]) > 21) {
           valueArray[0] = 1
+        } else {
+          valueArray[0] = 11
         }
       } else if (Array.isArray(valueArray[1])) {
         if ((valueArray[0] + 11) > 21) {
           valueArray[1] = 1
+        } else {
+          valueArray[1] = 11
         }
       }
     }
@@ -492,6 +437,7 @@ class App extends Component {
     return handValue;
   }
   // ========================================================
+
 
 
   // END GAME================================================
@@ -516,11 +462,7 @@ class App extends Component {
 
           {this.state.joinGameScreen && <JoinGame submit={this.handleSubmitJoinGame} change={this.handleChangeGameID}/>}
         
-          {this.state.waitingForPlayerScreen && <WaitingForPlayer />}
-
-          {/* {this.state.playersPresent && <WaitingForCards player1={this.state.player1} />} */}
-
-        {/* {console.log("players present in render", this.state.playersPresent)} */}
+          {this.state.waitingForPlayerScreen && <WaitingForPlayer gameID={this.state.game.deck_id}/>}
 
           {this.state.playersPresent && <GameTable 
           player1={this.state.player1} 
