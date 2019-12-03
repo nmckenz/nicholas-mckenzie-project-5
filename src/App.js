@@ -3,6 +3,10 @@ import firebase from "./firebase.js";
 import { Animated } from "react-animated-css";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import ReactDOM from 'react-dom'
+import { library } from '@fortawesome/fontawesome-svg-core'
+// import { fab } from '@fortawesome/free-brands-svg-icons'
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons'
 import axios from "axios";
 import StartScreen from "./StartScreen.js";
 import JoinGame from "./JoinGame.js";
@@ -11,6 +15,9 @@ import WaitingForCards from "./WaitingForCards.js"
 import GameTable from "./GameTable.js"
 import './App.css';
 import { readSync } from 'fs';
+
+
+  // < i class="far fa-window-close" ></i >
 
 
 
@@ -22,12 +29,18 @@ class App extends Component {
       game: null,
       player1: false,
       player2: false,
-      player1cards: false,
-      player2cards: false,
+      player1Cards: false,
+      player2Cards: false,
+      dealerCards: false,
+      player1CardValues: [],
+      player2CardValues: [],
+      dealerCardValues: [],
       player1CardImages: {},
       player2CardImages: {},
+      dealerCardImages: {},
       player1HasImages: false,
       player2HasImages: false,
+      dealerHasImages: false,
       player1Ready: false,
       player2Ready: false,
       playersReady: false,
@@ -48,10 +61,10 @@ class App extends Component {
 
     dbRef.on("value", (snapshot) => {
       const database = snapshot.val()
-      console.log("database snapshot", snapshot)
-      console.log("database on change", database)
+      // console.log("database snapshot", snapshot)
+      // console.log("database on change", database)
 
-      console.log("state players present", this.state.playersPresent)
+      // console.log("state players present", this.state.playersPresent)
       if (!this.state.playersPresent) {
         this.playersPresent(database);
       } 
@@ -59,8 +72,10 @@ class App extends Component {
       this.renderTrigger()
     });
     // ==============================================
+    
   };
-
+  // library.add(faWindowClose)
+  
   renderTrigger = () => {
     this.setState({
       blackjack: true
@@ -139,6 +154,15 @@ class App extends Component {
         }
 
         firebase.database().ref(`/player1`).set(defaultProfile)
+
+        const defaultDealerProfile = {
+          gameID: this.state.game.deck_id,
+          userName: "Dealer",
+          status: "initialize",
+          hand: ["empty"]
+        }
+
+        firebase.database().ref(`/dealer`).set(defaultDealerProfile)
         
         Swal.fire({
           icon: 'success',
@@ -336,13 +360,14 @@ class App extends Component {
         console.log("player 1 hand", card1, card2)
       })
       
-      const card1image = result.data.cards[0].images.svg
-      const card2image = result.data.cards[1].images.svg
-      const player1hand = { hand: {card1:card1image, card2:card2image} }
+      const card1image = result.data.cards[0].image
+      const card2image = result.data.cards[1].image
+      const player1hand = { hand: [card1image, card2image] }
       firebase.database().ref('/player1').update(player1hand)
 
       this.setState({
-        player1cards: true
+        player1Cards: true,
+        player1CardValues: [card1, card2]
       })
     })
 
@@ -357,13 +382,14 @@ class App extends Component {
         console.log("player 2 hand", card1, card2)
       })
 
-      const card1image = result.data.cards[0].images.svg
-      const card2image = result.data.cards[1].images.svg
-      const player2hand = { hand: { card1: card1image, card2: card2image } }
+      const card1image = result.data.cards[0].image
+      const card2image = result.data.cards[1].image
+      const player2hand = { hand: [card1image, card2image] }
       firebase.database().ref('/player2').update(player2hand)
 
       this.setState({
-        player2cards: true
+        player2Cards: true,
+        player2CardValues: [card1, card2]
       })
 
       // if (this.state.player1cards && this.state.player2cards) {
@@ -373,12 +399,36 @@ class App extends Component {
       //   })
       // }
     })
+
+    const dealDealerCards = "draw/?count=2";
+    this.getData(this.state.game.deck_id, dealDealerCards).then((result) => {
+      console.log("deal dealer result", result)
+
+      const card1 = result.data.cards[0].code;
+      const card2 = result.data.cards[1].code;
+      const takeDealerCards = `pile/player1/add/?cards=${card1},${card2}`;
+      this.getData(this.state.game.deck_id, takeDealerCards).then((result) => {
+        console.log("dealer hand", card1, card2)
+      })
+
+      const card1image = result.data.cards[0].image
+      const card2image = result.data.cards[1].image
+      const dealerHand = { hand: [card1image, card2image] }
+      firebase.database().ref('/dealer').update(dealerHand)
+
+      this.setState({
+        dealerCards: true,
+        dealerCardValues: [card1, card2]
+      })
+    })
   }
   // ========================================================
   
 
+
+  // GET CARD IMAGES=========================================
   getCardImages = (player) => {
-    console.log("concat test", `/${player}/hand`)
+    // console.log("concat test", `/${player}/hand`)
     const cardImagesObject = firebase.database().ref(`/${player}/hand`).on("value", data => {
       console.log("firebase card image data", data.val())
       if (player === "player1") {
@@ -391,9 +441,71 @@ class App extends Component {
           player2CardImages: data.val(),
           player2HasImages: true
         })
+      } else if (player === "dealer") {
+        this.setState({
+          dealerCardImages: data.val(),
+          dealerHasImages: true
+        })
       }
     })
   }
+  // ========================================================
+
+
+  // HAND VALUATION==========================================
+  evalHand = (handArray) => {
+    const oldArray = [...handArray];
+    let valueArray = oldArray.map((card) => {
+      const singleCardArray = Array.from(card)
+      console.log("single card array", singleCardArray)
+      const parseValue = parseInt(singleCardArray[0])
+      console.log("parse value", parseValue)
+      const faceCardsArray = ["A", "J", "Q", "K"]
+      if (faceCardsArray.includes(singleCardArray[0]) && singleCardArray[0] !== "A") {
+        return 10;
+      } else if (singleCardArray[0] === "A") {
+        return [11, 1]
+      } else {
+        if (parseValue === 0) {
+          return 10;
+        } else {
+          return parseValue;
+        }
+      }
+    })
+    console.log("value array", valueArray)
+
+    if (Array.isArray(valueArray[0]) || Array.isArray(valueArray[1])) {
+      console.log("Array.isArray -1", valueArray[0], valueArray[1])
+      if (Array.isArray(valueArray[0])) {
+        if ((11 + valueArray[1]) > 21) {
+          valueArray[0] = 1
+        }
+      } else if (Array.isArray(valueArray[1])) {
+        if ((valueArray[0] + 11) > 21) {
+          valueArray[1] = 1
+        }
+      }
+    }
+
+    const handValue = valueArray[0] + valueArray[1];
+    return handValue;
+  }
+  // ========================================================
+
+
+  // END GAME================================================
+  handleClickClose = (event) => {
+    const defaultFirebase = {
+      game: {
+        status: "ready"
+      }
+    }
+    firebase.database().ref().set(defaultFirebase)
+    window.location.reload(false);
+  }
+  // ========================================================
+
 
 
   // RENDER==================================================
@@ -408,7 +520,7 @@ class App extends Component {
 
           {/* {this.state.playersPresent && <WaitingForCards player1={this.state.player1} />} */}
 
-        {console.log("players present in render", this.state.playersPresent)}
+        {/* {console.log("players present in render", this.state.playersPresent)} */}
 
           {this.state.playersPresent && <GameTable 
           player1={this.state.player1} 
@@ -416,13 +528,21 @@ class App extends Component {
           playersReady={this.state.playersReady} 
           click={this.handleClickReady} 
           clickDeal={this.handleClickDeal} 
-          player1Cards={this.state.player1cards} 
-          player2Cards={this.state.player2cards}
+          player1Cards={this.state.player1Cards} 
+          player2Cards={this.state.player2Cards}
+          dealerCards={this.state.dealerCards}
+          player1CardValues={this.state.player1CardValues}
+          player2CardValues={this.state.player2CardValues}
+          dealerCardValues={this.state.dealerCardValues}
           cardImages={this.getCardImages}
           player1CardImages={this.state.player1CardImages}
           player2CardImages={this.state.player2CardImages}
+          dealerCardImages={this.state.dealerCardImages}
           player1HasImages={this.state.player1HasImages}
           player2HasImages={this.state.player2HasImages}
+          dealerHasImages={this.state.dealerHasImages}
+          evaluateHand={this.evalHand}
+          endGame={this.handleClickClose}
           />}
 
       </div>
