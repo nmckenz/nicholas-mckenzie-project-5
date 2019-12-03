@@ -65,9 +65,9 @@ class GameTable extends Component {
                 )
             } else {
                 return (
-                    <div>
+                    <div className="wrapper">
                         <h1>Blackjack Buddies</h1>
-                        
+
                         {this.props.dealerCards ? (<DealerHand 
                         cardValues={this.props.dealerCardValues}
                         cardImages={this.props.dealerCardImages}

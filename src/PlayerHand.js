@@ -19,7 +19,7 @@ class PlayerHand extends Component {
     render() {
         return (
             <div className="cards">
-                <div>
+                <div className="nameLabel">
                     <p>Player:</p>
                 </div>
                 <div className="card1">

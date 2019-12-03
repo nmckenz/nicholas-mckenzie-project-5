@@ -19,7 +19,7 @@ class DealerHand extends Component {
     render() {
         return (
             <div className="cards">
-                <div>
+                <div className="nameLabel">
                     <p>Dealer:</p>
                 </div>
                 <div className="card1">
