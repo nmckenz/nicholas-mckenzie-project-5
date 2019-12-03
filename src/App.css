@@ -79,8 +79,8 @@ button {
 }
 
 .logoImage {
-  width: 20%;
-  margin-bottom: 25px;
+  width: 15%;
+  margin-bottom: 15px;
 }
 
 .instructions {
@@ -128,4 +128,8 @@ button {
 
 .value {
   display: inline-block;
+}
+
+.endGameButton {
+  margin: 0px 15px;
 }

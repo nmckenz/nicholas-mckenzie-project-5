@@ -11,7 +11,7 @@ class GameTable extends Component {
         }
     }
 
-    
+
     
     render() {
         const card1ImageElement = `<img src="${this.props.player1CardImages.card1}"/>`
@@ -29,8 +29,15 @@ class GameTable extends Component {
                         <h3>As soon as you're feeling lucky hit the <span>deal</span> button.</h3>
                         <h3>Not your time to shine? Hit the <span>end game</span> button</h3>
                         <button onClick={this.props.clickDeal} className="button">deal</button>
-                        <button onClick={this.props.endGame} className="button">end game</button>
+                        <button onClick={this.props.endGame} className="button endGameButton">end game</button>
                     </div>
+                </div>
+            );
+        } else if (this.props.playersReady && this.props.player2 && this.props.cardsDealt) {
+            return (
+                <div className="wrapper">
+                        <h1>Blackjack Buddies</h1>
+                        <p>cards go here</p>
                 </div>
             );
         } else if (this.props.playersReady && this.props.player2 && !this.props.player2Cards) {

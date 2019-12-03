@@ -486,6 +486,7 @@ class App extends Component {
           player1Cards={this.state.player1Cards} 
           player2Cards={this.state.player2Cards}
           dealerCards={this.state.dealerCards}
+          cardsDealt={this.state.cardsDealt}
           player1CardValues={this.state.player1CardValues}
           player2CardValues={this.state.player2CardValues}
           dealerCardValues={this.state.dealerCardValues}

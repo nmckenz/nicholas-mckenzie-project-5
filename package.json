@@ -1,7 +1,7 @@
 {
   "name": "blackjack-app",
   "version": "0.1.0",
-  "homepage": "https://nmckenz.github.io/gh-pages-app",
+  "homepage": "https://nmckenz.github.io/nicholas-mckenzie-project-5",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
