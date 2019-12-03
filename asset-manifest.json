@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/gh-pages-app/static/css/main.b148a987.chunk.css",
+    "main.js": "/gh-pages-app/static/js/main.48aa0274.chunk.js",
+    "main.js.map": "/gh-pages-app/static/js/main.48aa0274.chunk.js.map",
+    "runtime-main.js": "/gh-pages-app/static/js/runtime-main.18d2324b.js",
+    "runtime-main.js.map": "/gh-pages-app/static/js/runtime-main.18d2324b.js.map",
+    "static/js/2.febd1b74.chunk.js": "/gh-pages-app/static/js/2.febd1b74.chunk.js",
+    "static/js/2.febd1b74.chunk.js.map": "/gh-pages-app/static/js/2.febd1b74.chunk.js.map",
+    "index.html": "/gh-pages-app/index.html",
+    "precache-manifest.5f6a29ceb916861bdadfc1397208d4df.js": "/gh-pages-app/precache-manifest.5f6a29ceb916861bdadfc1397208d4df.js",
+    "service-worker.js": "/gh-pages-app/service-worker.js",
+    "static/css/main.b148a987.chunk.css.map": "/gh-pages-app/static/css/main.b148a987.chunk.css.map",
+    "static/media/welcomeScreenImage.png": "/gh-pages-app/static/media/welcomeScreenImage.6e11f215.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.18d2324b.js",
+    "static/js/2.febd1b74.chunk.js",
+    "static/css/main.b148a987.chunk.css",
+    "static/js/main.48aa0274.chunk.js"
+  ]
+}
