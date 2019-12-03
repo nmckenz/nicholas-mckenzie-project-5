@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/nicholas-mckenzie-project-5/static/css/main.9912f888.chunk.css",
+    "main.css": "/nicholas-mckenzie-project-5/static/css/main.49ae9986.chunk.css",
     "main.js": "/nicholas-mckenzie-project-5/static/js/main.58390e37.chunk.js",
     "main.js.map": "/nicholas-mckenzie-project-5/static/js/main.58390e37.chunk.js.map",
     "runtime-main.js": "/nicholas-mckenzie-project-5/static/js/runtime-main.b334a19b.js",
@@ -8,15 +8,15 @@
     "static/js/2.0b9c4826.chunk.js": "/nicholas-mckenzie-project-5/static/js/2.0b9c4826.chunk.js",
     "static/js/2.0b9c4826.chunk.js.map": "/nicholas-mckenzie-project-5/static/js/2.0b9c4826.chunk.js.map",
     "index.html": "/nicholas-mckenzie-project-5/index.html",
-    "precache-manifest.0db291a6dd548e40d8d999359cd810da.js": "/nicholas-mckenzie-project-5/precache-manifest.0db291a6dd548e40d8d999359cd810da.js",
+    "precache-manifest.fdf94650b5d9d6508660f77fd0ce590d.js": "/nicholas-mckenzie-project-5/precache-manifest.fdf94650b5d9d6508660f77fd0ce590d.js",
     "service-worker.js": "/nicholas-mckenzie-project-5/service-worker.js",
-    "static/css/main.9912f888.chunk.css.map": "/nicholas-mckenzie-project-5/static/css/main.9912f888.chunk.css.map",
+    "static/css/main.49ae9986.chunk.css.map": "/nicholas-mckenzie-project-5/static/css/main.49ae9986.chunk.css.map",
     "static/media/welcomeScreenImage.png": "/nicholas-mckenzie-project-5/static/media/welcomeScreenImage.6e11f215.png"
   },
   "entrypoints": [
     "static/js/runtime-main.b334a19b.js",
     "static/js/2.0b9c4826.chunk.js",
-    "static/css/main.9912f888.chunk.css",
+    "static/css/main.49ae9986.chunk.css",
     "static/js/main.58390e37.chunk.js"
   ]
 }

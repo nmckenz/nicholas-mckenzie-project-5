@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/nicholas-mckenzie-project-5/precache-manifest.0db291a6dd548e40d8d999359cd810da.js"
+  "/nicholas-mckenzie-project-5/precache-manifest.fdf94650b5d9d6508660f77fd0ce590d.js"
 );
 
 self.addEventListener('message', (event) => {
