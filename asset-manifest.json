@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/gh-pages-app/static/css/main.481f48d0.chunk.css",
-    "main.js": "/gh-pages-app/static/js/main.4968fe8e.chunk.js",
-    "main.js.map": "/gh-pages-app/static/js/main.4968fe8e.chunk.js.map",
-    "runtime-main.js": "/gh-pages-app/static/js/runtime-main.18d2324b.js",
-    "runtime-main.js.map": "/gh-pages-app/static/js/runtime-main.18d2324b.js.map",
-    "static/js/2.febd1b74.chunk.js": "/gh-pages-app/static/js/2.febd1b74.chunk.js",
-    "static/js/2.febd1b74.chunk.js.map": "/gh-pages-app/static/js/2.febd1b74.chunk.js.map",
-    "index.html": "/gh-pages-app/index.html",
-    "precache-manifest.6d4e72ad0b9ac71324eaf888ef994324.js": "/gh-pages-app/precache-manifest.6d4e72ad0b9ac71324eaf888ef994324.js",
-    "service-worker.js": "/gh-pages-app/service-worker.js",
-    "static/css/main.481f48d0.chunk.css.map": "/gh-pages-app/static/css/main.481f48d0.chunk.css.map",
-    "static/media/welcomeScreenImage.png": "/gh-pages-app/static/media/welcomeScreenImage.6e11f215.png"
+    "main.css": "/nicholas-mckenzie-project-5/static/css/main.9912f888.chunk.css",
+    "main.js": "/nicholas-mckenzie-project-5/static/js/main.58390e37.chunk.js",
+    "main.js.map": "/nicholas-mckenzie-project-5/static/js/main.58390e37.chunk.js.map",
+    "runtime-main.js": "/nicholas-mckenzie-project-5/static/js/runtime-main.b334a19b.js",
+    "runtime-main.js.map": "/nicholas-mckenzie-project-5/static/js/runtime-main.b334a19b.js.map",
+    "static/js/2.0b9c4826.chunk.js": "/nicholas-mckenzie-project-5/static/js/2.0b9c4826.chunk.js",
+    "static/js/2.0b9c4826.chunk.js.map": "/nicholas-mckenzie-project-5/static/js/2.0b9c4826.chunk.js.map",
+    "index.html": "/nicholas-mckenzie-project-5/index.html",
+    "precache-manifest.0db291a6dd548e40d8d999359cd810da.js": "/nicholas-mckenzie-project-5/precache-manifest.0db291a6dd548e40d8d999359cd810da.js",
+    "service-worker.js": "/nicholas-mckenzie-project-5/service-worker.js",
+    "static/css/main.9912f888.chunk.css.map": "/nicholas-mckenzie-project-5/static/css/main.9912f888.chunk.css.map",
+    "static/media/welcomeScreenImage.png": "/nicholas-mckenzie-project-5/static/media/welcomeScreenImage.6e11f215.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.18d2324b.js",
-    "static/js/2.febd1b74.chunk.js",
-    "static/css/main.481f48d0.chunk.css",
-    "static/js/main.4968fe8e.chunk.js"
+    "static/js/runtime-main.b334a19b.js",
+    "static/js/2.0b9c4826.chunk.js",
+    "static/css/main.9912f888.chunk.css",
+    "static/js/main.58390e37.chunk.js"
   ]
 }
