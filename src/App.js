@@ -24,6 +24,7 @@ class App extends Component {
     this.state = {
       blackjack: "",
       game: null,
+      cardsDealt: false,
       player1: false,
       player2: false,
       player1Cards: false,
@@ -58,9 +59,17 @@ class App extends Component {
 
     dbRef.on("value", (snapshot) => {
       const database = snapshot.val()
+      console.log("database", database)
+
       if (!this.state.playersPresent) {
         this.playersPresent(database);
-      } 
+      }
+
+      if (!this.state.cardsDealt && database.game.status == "in progress") {
+        this.setState({
+          cardsDealt: true
+        })
+      }
       this.renderTrigger()
     });
     // ==============================================
@@ -156,6 +165,7 @@ class App extends Component {
         }
 
         firebase.database().ref(`/dealer`).set(defaultDealerProfile)
+
         
         Swal.fire({
           icon: 'success',
@@ -356,6 +366,9 @@ class App extends Component {
       const card2image = result.data.cards[1].image
       const dealerHand = { hand: [card1image, card2image] }
       firebase.database().ref('/dealer').update(dealerHand)
+
+      const ready = { status: "in progress" };
+      firebase.database().ref('/game').update(ready)
 
       this.setState({
         dealerCards: true,
